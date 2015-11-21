@@ -1,0 +1,6 @@
+setwd("C:\\Users\\SONY\\Desktop\\project\\distance Measurement\\distance Measurement")
+data = read.csv("data.csv")
+library(caTools)
+sp = split(data$A, SplitRatio = 0.7)
+train = subset(data$A, sp == TRUE)
+test = subset(data$A, sp == FALSE)

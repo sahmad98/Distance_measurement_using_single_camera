@@ -1,0 +1,38 @@
+erode(img_gray, img_gray, Mat(), Point(-1,-1), 4);
+		dilate(img_gray, img_gray, Mat(), Point(-1,-1), 4);
+
+		vector<vector<Size>> contors;
+		vector<Vec4i> heirarcy;
+		findContours(img_gray, contors, heirarcy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+
+		vector<Rect> boundRect(contors.size());
+		vector<vector<Point>> contor_poly(contors.size());
+	
+		for(int i =0; i< contors.size(); i++)
+		{
+			approxPolyDP(Mat(contors[i]), contor_poly[i], 3, true);
+			boundRect[i] = boundingRect(Mat(contor_poly[i]));
+		}
+		int max_index = 0,max = 0;
+		for(int i =0; i< contors.size(); i++)
+		{
+			int a = boundRect[i].area(); 
+			if( a > max)
+			{ 
+				max = a;
+				max_index = i;
+			}
+		}
+
+		/*for(int i=0; i< contors.size(); i++)
+		{
+			if(boundRect[i].area() > 200)
+				rectangle(img, boundRect[i].tl(), boundRect[i].br(), Scalar(0,255,0), 2, 8, 0); 
+		}*/
+		if(boundRect.size() > 0)
+		{	
+			rectangle(img, boundRect[max_index].tl(), boundRect[max_index].br(), Scalar(0,255,0), 2, 8, 0);
+			//fprintf(data,"%d , %d , %d\n", boundRect[max_index].width, boundRect[max_index].height, boundRect[max_index].area());
+			distance = 8414.7*pow(boundRect[max_index].area(), -0.468);
+			cout << distance << " cm." <<endl;
+		}

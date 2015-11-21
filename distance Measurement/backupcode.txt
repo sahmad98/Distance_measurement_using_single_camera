@@ -1,0 +1,81 @@
+// distance Measurement.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "cv.h"
+#include "highgui.h"
+#include "opencv2\imgproc\imgproc_c.h"
+#include<fstream>
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	using namespace std;
+	using namespace cv;
+
+	Mat img, img_gray, channel[3];
+	VideoCapture cam(1);
+	
+	FILE *data;
+	data = fopen("data320.csv","a");
+	
+	cam.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
+	cam.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
+	cam.set(CV_CAP_PROP_CONVERT_RGB, 1);
+	
+	while(waitKey(10) != 'a')
+	{
+		cam >> img;
+		cvtColor(img, img_gray, COLOR_RGB2GRAY);
+		split(img, channel);
+		subtract(channel[2], img_gray, img_gray);
+		//convertScaleAbs(img, img);
+		threshold(img_gray, img_gray, 90, 255, THRESH_BINARY);
+
+		erode(img_gray, img_gray, Mat(), Point(-1,-1), 4);
+		dilate(img_gray, img_gray, Mat(), Point(-1,-1), 4);
+
+		vector<vector<Size>> contors;
+		vector<Vec4i> heirarcy;
+		findContours(img_gray, contors, heirarcy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+
+		vector<Rect> boundRect(contors.size());
+		vector<vector<Point>> contor_poly(contors.size());
+	
+		for(int i =0; i< contors.size(); i++)
+		{
+			approxPolyDP(Mat(contors[i]), contor_poly[i], 3, true);
+			boundRect[i] = boundingRect(Mat(contor_poly[i]));
+		}
+		int max_index = 0,max = 0;
+		for(int i =0; i< contors.size(); i++)
+		{
+			int a = boundRect[i].area(); 
+			if( a > max)
+			{ 
+				max = a;
+				max_index = i;
+			}
+		}
+
+		/*for(int i=0; i< contors.size(); i++)
+		{
+			if(boundRect[i].area() > 200)
+				rectangle(img, boundRect[i].tl(), boundRect[i].br(), Scalar(0,255,0), 2, 8, 0); 
+		}*/
+		if(boundRect.size() > 0)
+		{	
+			rectangle(img, boundRect[max_index].tl(), boundRect[max_index].br(), Scalar(0,255,0), 2, 8, 0);
+			fprintf(data,"%d , %d , %d\n", boundRect[max_index].width, boundRect[max_index].height, boundRect[max_index].area());
+		}
+		namedWindow("Frame", WINDOW_AUTOSIZE);
+		imshow("Frame", img);
+	}
+	
+
+	
+	fflush(data);
+	fclose(data);
+	cam.release();
+	return 0;
+}
+
