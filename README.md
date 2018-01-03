@@ -5,7 +5,7 @@ The camera used in this project is **Logitech HD camera**.
 
 ### Reference Documents
 
-* [Summer Intership Report](https://drive.google.com/file/d/0B-2k62V_M6QHWTU5R2N4QUJtZVE/view?usp=sharing)
+* [Summer Internship Report](https://drive.google.com/file/d/0B-2k62V_M6QHWTU5R2N4QUJtZVE/view?usp=sharing)
 
 ### Have any improvement idea?
 
